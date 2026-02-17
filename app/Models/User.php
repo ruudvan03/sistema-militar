@@ -30,7 +30,7 @@ class User extends Authenticatable implements JWTSubject // IMPLEMENTAR INTERFAZ
         'password' => 'hashed',
     ];
 
-    // MÉTODOS OBLIGATORIOS PARA JWT
+    // --- MÉTODOS OBLIGATORIOS PARA JWT ---
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -43,5 +43,13 @@ class User extends Authenticatable implements JWTSubject // IMPLEMENTAR INTERFAZ
             'matricula' => $this->matricula,
             'area' => $this->area
         ];
+    }
+
+    // --- RELACIONES DE BASE DE DATOS (LA CORRECCIÓN) ---
+    
+    // Un usuario puede tener muchos documentos subidos
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 }
