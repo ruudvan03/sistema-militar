@@ -3,35 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\AdminController; 
 
-// --- RUTAS PÚBLICAS ---
+// --- 1. RUTAS PÚBLICAS (Solo Login con Token) ---
 Route::get('/', function () { return redirect()->route('login'); });
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login-token', [AuthController::class, 'loginWithToken'])->name('login.token');
-Route::get('/registro', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/registro', [AuthController::class, 'register'])->name('register.post');
 
-// --- RUTAS PROTEGIDAS (Cualquier usuario logueado con Token) ---
+// --- 2. RUTAS PROTEGIDAS (Usuarios y Admin) ---
 Route::middleware('auth')->group(function () {
-    
-    // Todos pueden ver el Dashboard (El controlador decide qué mostrar)
     Route::get('/dashboard', [DocumentController::class, 'index'])->name('dashboard');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    // Rutas Operativas (Subir/Bajar)
+    
+    // Subir documento
     Route::post('/documentos', [DocumentController::class, 'store'])->name('documents.store');
+    
+    // Acciones sobre el documento (Previsualizar, Descargar, Eliminar)
+    Route::get('/documentos/{id}/ver', [DocumentController::class, 'preview'])->name('documents.preview'); 
     Route::get('/documentos/{id}', [DocumentController::class, 'download'])->name('documents.download');
-
+    Route::delete('/documentos/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    
+    // Cerrar sesión
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// --- ZONA DE SEGURIDAD (Solo Admin/Servidor) ---
-// Si un usuario normal intenta escribir estas URLs, recibirá error 403
+// --- 3. ZONA DE MANDO (Solo Admin) ---
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    
-    // Ejemplo: Una ruta futura para ver todos los usuarios registrados
-    Route::get('/usuarios', function() {
-        return "PANEL DE CONTROL DE PERSONAL - SOLO SERVIDOR";
-    });
-    
-    // Aquí pondrías rutas como: Eliminar usuarios, Borrar archivos, etc.
+    // Ruta para que el Admin registre nuevo personal desde el Dashboard
+    Route::post('/crear-personal', [AdminController::class, 'createUser'])->name('admin.create_user');
 });

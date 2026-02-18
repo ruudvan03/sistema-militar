@@ -59,4 +59,29 @@ class DocumentController extends Controller
 
         return Storage::download($document->ruta_archivo, $document->titulo . '.' . $document->tipo);
     }
+
+    // 4. PREVISUALIZAR ARCHIVO EN EL NAVEGADOR
+    public function preview($id)
+    {
+        $document = Document::findOrFail($id);
+        $user = Auth::user();
+
+        // SEGURIDAD: Solo puede verlo el ADMIN o el DUEÑO
+        if ($user->role !== 'admin' && $document->user_id !== $user->id) {
+            abort(403, 'ACCESO DENEGADO: NO TIENE AUTORIZACIÓN PARA VER ESTE DOCUMENTO.');
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::exists($document->ruta_archivo)) {
+            abort(404, 'EL ARCHIVO FÍSICO NO FUE ENCONTRADO EN LA BÓVEDA.');
+        }
+
+        // Obtenemos el tipo exacto del archivo
+        $mimeType = \Illuminate\Support\Facades\Storage::mimeType($document->ruta_archivo);
+
+        // Le ordenamos explícitamente al navegador mostrarlo en línea ('inline')
+        return response()->make(\Illuminate\Support\Facades\Storage::get($document->ruta_archivo), 200, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($document->ruta_archivo) . '"'
+        ]);
+    }
 }

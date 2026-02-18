@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject; // IMPORTANTE
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject; 
 
-class User extends Authenticatable implements JWTSubject // IMPLEMENTAR INTERFAZ
+class User extends Authenticatable implements JWTSubject 
 {
     use HasFactory, Notifiable;
 
@@ -45,7 +45,7 @@ class User extends Authenticatable implements JWTSubject // IMPLEMENTAR INTERFAZ
         ];
     }
 
-    // --- RELACIONES DE BASE DE DATOS (LA CORRECCIÓN) ---
+    // --- RELACIONES DE BASE DE DATOS ---
     
     // Un usuario puede tener muchos documentos subidos
     public function documents()

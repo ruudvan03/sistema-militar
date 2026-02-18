@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth; // Importante
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth; 
 
 class AuthController extends Controller
 {
@@ -24,7 +24,7 @@ class AuthController extends Controller
             'matricula' => 'required|unique:users',
             'area' => 'required',
             'especialidad' => 'required',
-            'password' => 'required|min:6', // Igual pedimos pass por seguridad interna
+            'password' => 'required|min:6', 
         ]);
 
         // Creamos al usuario

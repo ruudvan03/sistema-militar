@@ -15,7 +15,7 @@ class Document extends Model
         'titulo',
         'ruta_archivo',
         'tipo',
-        'user_id' // Importante para vincularlo al dueño
+        'user_id' 
     ];
 
     // 2. RELACIÓN INVERSA (Un Documento pertenece a un Usuario)

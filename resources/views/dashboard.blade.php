@@ -30,46 +30,102 @@
     <div class="container mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div class="lg:col-span-1">
-            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-800">
+            
+            @if(Auth::user()->role == 'admin')
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-800 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                    Alta de Personal
+                </h2>
+
+                @if(session('new_user_token'))
+                    <div class="bg-yellow-50 text-yellow-900 p-4 rounded mb-4 border border-yellow-300 shadow-sm">
+                        <p class="font-bold text-sm uppercase">Elemento: <span class="text-black">{{ session('new_user_name') }}</span></p>
+                        <p class="font-bold text-xs uppercase mt-3 text-red-700">TOKEN DE ACCESO:</p>
+                        
+                        <textarea id="tokenToCopy" readonly class="w-full h-20 text-xs font-mono p-2 bg-white border border-yellow-400 mt-1 rounded focus:outline-none focus:ring-1 focus:ring-yellow-500">{{ session('new_user_token') }}</textarea>
+                        
+                        <button type="button" onclick="copiarToken()" id="copyBtn" class="mt-2 w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-2 rounded flex items-center justify-center gap-2 transition shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <span id="copyBtnText">COPIAR TOKEN</span>
+                        </button>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.create_user') }}" method="POST" class="space-y-4 text-sm">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Grado</label>
+                        <input type="text" name="grado" placeholder="Ej: Cabo" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nombre Completo</label>
+                        <input type="text" name="name" placeholder="Nombre completo del elemento" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Matrícula</label>
+                        <input type="text" name="matricula" placeholder="No. de Matrícula" class="w-full border p-2 rounded bg-gray-50 uppercase focus:border-red-500 focus:outline-none" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Área</label>
+                            <input type="text" name="area" placeholder="Ej: Sanidad" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Especialidad</label>
+                            <input type="text" name="especialidad" placeholder="Ej: Enfermería" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-red-800 hover:bg-red-900 font-bold py-2.5 rounded transition text-white shadow">
+                        GENERAR ACCESO
+                    </button>
+                </form>
+            </div>
+            @endif
+
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-800 mb-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <svg class="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                     Subir Documentación
                 </h2>
                 
                 @if(session('success'))
-                    <div class="bg-green-100 text-green-800 p-2 rounded mb-4 text-sm font-bold border border-green-200">
+                    <div class="bg-green-100 text-green-800 p-3 rounded mb-4 text-sm font-bold border border-green-200">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 text-sm">
                     @csrf
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Título del Documento</label>
-                        <input type="text" name="titulo" class="w-full border p-2 rounded bg-gray-50" placeholder="Ej: Reporte Diario" required>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Título del Documento</label>
+                        <input type="text" name="titulo" class="w-full border p-2 rounded bg-gray-50 focus:border-green-600 focus:outline-none" placeholder="Ej: Reporte Diario" required>
                     </div>
                     
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Archivo (PDF, Excel, Word)</label>
-                        <input type="file" name="archivo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" required>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Archivo (PDF, Excel, Word)</label>
+                        <input type="file" name="archivo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" required>
                     </div>
 
-                    <button type="submit" class="w-full bg-green-800 text-white font-bold py-2 rounded hover:bg-green-900 transition">
+                    <button type="submit" class="w-full bg-green-800 text-white font-bold py-2.5 rounded hover:bg-green-900 transition shadow">
                         RESGUARDAR ARCHIVO
                     </button>
                 </form>
             </div>
 
-            <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
-                <h3 class="font-bold text-gray-500 text-sm uppercase mb-2">Mi Credencial</h3>
-                <div class="text-sm">
-                    <p><strong>Matrícula:</strong> {{ Auth::user()->matricula }}</p>
-                    <p><strong>Especialidad:</strong> {{ Auth::user()->especialidad }}</p>
-                    <p><strong>Rol:</strong> 
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-gray-400">
+                <h3 class="font-bold text-gray-500 text-sm uppercase mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                    Mi Credencial
+                </h3>
+                <div class="text-sm space-y-2">
+                    <p><strong class="text-gray-700">Matrícula:</strong> {{ Auth::user()->matricula }}</p>
+                    <p><strong class="text-gray-700">Especialidad:</strong> {{ Auth::user()->especialidad }}</p>
+                    <p><strong class="text-gray-700">Nivel de Acceso:</strong> 
                         @if(Auth::user()->role == 'admin')
-                            <span class="text-red-600 font-bold">SERVIDOR CENTRAL</span>
+                            <span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200">SERVIDOR CENTRAL</span>
                         @else
-                            <span class="text-green-600 font-bold">PERSONAL OPERATIVO</span>
+                            <span class="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-200">PERSONAL OPERATIVO</span>
                         @endif
                     </p>
                 </div>
@@ -79,53 +135,72 @@
         <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="bg-gray-800 text-white p-4 border-b border-gray-700 flex justify-between items-center">
-                    <h2 class="text-lg font-bold">Expediente Digital</h2>
-                    <span class="bg-gray-700 text-xs px-2 py-1 rounded">{{ $documents->count() }} Archivos</span>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Expediente Digital
+                    </h2>
+                    <span class="bg-gray-700 text-xs px-2 py-1 rounded font-bold">{{ $documents->count() }} Archivos</span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                             <tr>
-                                <th class="px-6 py-3">Documento</th>
-                                <th class="px-6 py-3">Tipo</th>
+                                <th class="px-6 py-4">Documento</th>
+                                <th class="px-6 py-4">Tipo</th>
                                 @if(Auth::user()->role == 'admin')
-                                    <th class="px-6 py-3">Subido Por</th>
+                                    <th class="px-6 py-4">Subido Por</th>
                                 @endif
-                                <th class="px-6 py-3">Fecha</th>
-                                <th class="px-6 py-3 text-center">Acción</th>
+                                <th class="px-6 py-4">Fecha</th>
+                                <th class="px-6 py-4 text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($documents as $doc)
-                            <tr class="bg-white border-b hover:bg-gray-50">
-                                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            <tr class="bg-white border-b hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap">
                                     {{ $doc->titulo }}
                                 </td>
                                 <td class="px-6 py-4 uppercase">
-                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $doc->tipo }}</span>
+                                    <span class="bg-gray-200 text-gray-800 text-xs font-bold px-2.5 py-1 rounded">{{ $doc->tipo }}</span>
                                 </td>
                                 
                                 @if(Auth::user()->role == 'admin')
                                     <td class="px-6 py-4">
                                         <div class="text-gray-900 font-bold">{{ $doc->user->grado }} {{ $doc->user->name }}</div>
-                                        <div class="text-xs">{{ $doc->user->matricula }}</div>
+                                        <div class="text-xs text-gray-500">{{ $doc->user->matricula }}</div>
                                     </td>
                                 @endif
 
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 text-xs font-medium">
                                     {{ $doc->created_at->format('d/m/Y H:i') }}
                                 </td>
-                                <td class="px-6 py-4 text-center">
-                                    <a href="{{ route('documents.download', $doc->id) }}" class="font-medium text-green-600 hover:underline hover:text-green-800">
-                                        Descargar
+                                
+                                <td class="px-6 py-4 text-center flex justify-center gap-4">
+                                    <a href="{{ route('documents.preview', $doc->id) }}" target="_blank" class="text-blue-600 hover:text-blue-800 transition" title="Previsualizar">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                     </a>
+
+                                    <a href="{{ route('documents.download', $doc->id) }}" class="text-green-600 hover:text-green-800 transition" title="Descargar">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    </a>
+
+                                    @if(Auth::user()->role == 'admin' || Auth::user()->id == $doc->user_id)
+                                        <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" onsubmit="return confirm('¿CONFIRMA LA DESTRUCCIÓN DE ESTE DOCUMENTO? Esta acción es irreversible.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Destruir Documento">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-gray-400 italic">
-                                    No hay documentación registrada en el sistema.
+                                <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                    <p class="font-medium">No hay documentación registrada en el sistema.</p>
                                 </td>
                             </tr>
                             @endforelse
@@ -136,5 +211,36 @@
         </div>
 
     </div>
+
+    <script>
+        function copiarToken() {
+            // Seleccionar el texto del textarea
+            var tokenTextarea = document.getElementById("tokenToCopy");
+            tokenTextarea.select();
+            tokenTextarea.setSelectionRange(0, 99999); // Para dispositivos móviles
+            
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(tokenTextarea.value).then(function() {
+                // Cambiar el estilo y texto del botón temporalmente
+                var btn = document.getElementById("copyBtn");
+                var btnText = document.getElementById("copyBtnText");
+                
+                var textoOriginal = btnText.innerHTML;
+                
+                btn.classList.remove('bg-yellow-400', 'text-yellow-900');
+                btn.classList.add('bg-green-600', 'text-white');
+                btnText.innerHTML = "¡COPIADO CON ÉXITO!";
+                
+                // Regresar al estado original después de 2.5 segundos
+                setTimeout(function() {
+                    btn.classList.remove('bg-green-600', 'text-white');
+                    btn.classList.add('bg-yellow-400', 'text-yellow-900');
+                    btnText.innerHTML = textoOriginal;
+                }, 2500);
+            }).catch(function(err) {
+                console.error('Error al copiar: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
