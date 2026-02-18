@@ -52,6 +52,16 @@
                     </div>
                 @endif
 
+                @if ($errors->any() && !request()->hasFile('archivo')) 
+                    <div class="bg-red-100 border-l-4 border-red-600 text-red-800 p-3 mb-4 text-sm font-bold shadow-sm">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form action="{{ route('admin.create_user') }}" method="POST" class="space-y-4 text-sm">
                     @csrf
                     <div>
@@ -92,6 +102,16 @@
                 @if(session('success'))
                     <div class="bg-green-100 text-green-800 p-3 rounded mb-4 text-sm font-bold border border-green-200">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any() && request()->hasFile('archivo')) 
+                    <div class="bg-red-100 border-l-4 border-red-600 text-red-800 p-3 mb-4 text-sm font-bold shadow-sm">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
@@ -147,7 +167,7 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                             <tr>
                                 <th class="px-6 py-4">Documento</th>
-                                <th class="px-6 py-4">Tipo</th>
+                                <th class="px-6 py-4">Estado</th>
                                 @if(Auth::user()->role == 'admin')
                                     <th class="px-6 py-4">Subido Por</th>
                                 @endif
@@ -157,14 +177,22 @@
                         </thead>
                         <tbody>
                             @forelse($documents as $doc)
-                            <tr class="bg-white border-b hover:bg-gray-50 transition">
+                            <tr class="bg-white border-b hover:bg-gray-50 transition {{ $doc->trashed() ? 'opacity-70 bg-red-50' : '' }}">
                                 <td class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap">
                                     {{ $doc->titulo }}
-                                </td>
-                                <td class="px-6 py-4 uppercase">
-                                    <span class="bg-gray-200 text-gray-800 text-xs font-bold px-2.5 py-1 rounded">{{ $doc->tipo }}</span>
+                                    <div class="text-xs text-gray-400 font-normal mt-1 uppercase">{{ $doc->tipo }}</div>
                                 </td>
                                 
+                                <td class="px-6 py-4">
+                                    @if($doc->estado == 'Original')
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded border border-blue-300">ORIGINAL</span>
+                                    @elseif($doc->estado == 'Actualizado')
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2.5 py-1 rounded border border-yellow-300">ACTUALIZADO</span>
+                                    @else
+                                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded border border-red-300">DESTRUIDO</span>
+                                    @endif
+                                </td>
+
                                 @if(Auth::user()->role == 'admin')
                                     <td class="px-6 py-4">
                                         <div class="text-gray-900 font-bold">{{ $doc->user->grado }} {{ $doc->user->name }}</div>
@@ -173,29 +201,64 @@
                                 @endif
 
                                 <td class="px-6 py-4 text-xs font-medium">
-                                    {{ $doc->created_at->format('d/m/Y H:i') }}
+                                    {{ $doc->updated_at->format('d/m/Y H:i') }}
                                 </td>
                                 
                                 <td class="px-6 py-4 text-center flex justify-center gap-4">
-                                    <a href="{{ route('documents.preview', $doc->id) }}" target="_blank" class="text-blue-600 hover:text-blue-800 transition" title="Previsualizar">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    </a>
+                                    @if($doc->trashed())
+                                        <span class="text-xs text-red-600 font-bold italic">ARCHIVO INACCESIBLE</span>
+                                    @else
+                                        <a href="{{ route('documents.preview', $doc->id) }}" target="_blank" class="text-blue-600 hover:text-blue-800 transition" title="Previsualizar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        </a>
 
-                                    <a href="{{ route('documents.download', $doc->id) }}" class="text-green-600 hover:text-green-800 transition" title="Descargar">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                    </a>
+                                        <a href="{{ route('documents.download', $doc->id) }}" class="text-green-600 hover:text-green-800 transition" title="Descargar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        </a>
 
-                                    @if(Auth::user()->role == 'admin' || Auth::user()->id == $doc->user_id)
-                                        <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" onsubmit="return confirm('¿CONFIRMA LA DESTRUCCIÓN DE ESTE DOCUMENTO? Esta acción es irreversible.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Destruir Documento">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        @if(Auth::user()->role == 'admin' || Auth::user()->id == $doc->user_id)
+                                            <button type="button" onclick="document.getElementById('edit-modal-{{$doc->id}}').showModal()" class="text-yellow-600 hover:text-yellow-800 transition" title="Actualizar Documento">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                             </button>
-                                        </form>
+
+                                            <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" onsubmit="return confirm('¿CONFIRMA LA DESTRUCCIÓN DE ESTE DOCUMENTO? Esta acción es irreversible.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Destruir Documento">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
+
+                            <dialog id="edit-modal-{{$doc->id}}" class="p-0 rounded-lg shadow-2xl border-t-4 border-yellow-500 w-full max-w-md backdrop:bg-black/50">
+                                <div class="bg-white p-6">
+                                    <h3 class="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        Reemplazar Documento
+                                    </h3>
+                                    <form action="{{ route('documents.update', $doc->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4 text-sm text-left">
+                                        @csrf
+                                        @method('PUT')
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Actualizar Título</label>
+                                            <input type="text" name="titulo" value="{{ $doc->titulo }}" class="w-full border p-2 rounded bg-gray-50 focus:border-yellow-500 focus:outline-none" required>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Subir Nuevo Archivo (Opcional)</label>
+                                            <input type="file" name="archivo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100">
+                                            <p class="text-xs text-gray-400 mt-1">Deje vacío si solo desea cambiar el título.</p>
+                                        </div>
+                                        <div class="flex justify-end gap-2 mt-6">
+                                            <button type="button" onclick="document.getElementById('edit-modal-{{$doc->id}}').close()" class="px-4 py-2 bg-gray-200 text-gray-800 font-bold rounded hover:bg-gray-300 transition">Cancelar</button>
+                                            <button type="submit" class="px-4 py-2 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-700 shadow-md transition">Guardar Cambios</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </dialog>
+                            
                             @empty
                             <tr>
                                 <td colspan="5" class="px-6 py-12 text-center text-gray-400">
@@ -214,14 +277,11 @@
 
     <script>
         function copiarToken() {
-            // Seleccionar el texto del textarea
             var tokenTextarea = document.getElementById("tokenToCopy");
             tokenTextarea.select();
-            tokenTextarea.setSelectionRange(0, 99999); // Para dispositivos móviles
+            tokenTextarea.setSelectionRange(0, 99999); 
             
-            // Copiar al portapapeles
             navigator.clipboard.writeText(tokenTextarea.value).then(function() {
-                // Cambiar el estilo y texto del botón temporalmente
                 var btn = document.getElementById("copyBtn");
                 var btnText = document.getElementById("copyBtnText");
                 
@@ -231,7 +291,6 @@
                 btn.classList.add('bg-green-600', 'text-white');
                 btnText.innerHTML = "¡COPIADO CON ÉXITO!";
                 
-                // Regresar al estado original después de 2.5 segundos
                 setTimeout(function() {
                     btn.classList.remove('bg-green-600', 'text-white');
                     btn.classList.add('bg-yellow-400', 'text-yellow-900');

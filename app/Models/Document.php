@@ -4,22 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; 
 
 class Document extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; 
 
-    // 1. CAMPOS QUE SE PUEDEN LLENAR MASIVAMENTE (Seguridad)
-    // Sin esto, el comando Document::create() fallaría.
     protected $fillable = [
+        'user_id',
         'titulo',
         'ruta_archivo',
         'tipo',
-        'user_id' 
+        'estado' 
     ];
 
-    // 2. RELACIÓN INVERSA (Un Documento pertenece a un Usuario)
-    // Esto permite usar $document->user->name en el Dashboard.
     public function user()
     {
         return $this->belongsTo(User::class);

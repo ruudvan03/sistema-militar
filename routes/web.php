@@ -17,9 +17,10 @@ Route::middleware('auth')->group(function () {
     // Subir documento
     Route::post('/documentos', [DocumentController::class, 'store'])->name('documents.store');
     
-    // Acciones sobre el documento (Previsualizar, Descargar, Eliminar)
+    // Acciones sobre el documento (Previsualizar, Descargar, Actualizar, Eliminar)
     Route::get('/documentos/{id}/ver', [DocumentController::class, 'preview'])->name('documents.preview'); 
     Route::get('/documentos/{id}', [DocumentController::class, 'download'])->name('documents.download');
+    Route::put('/documentos/{id}', [DocumentController::class, 'update'])->name('documents.update'); // <--- NUEVA RUTA PARA ACTUALIZAR
     Route::delete('/documentos/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
     
     // Cerrar sesión

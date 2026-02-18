@@ -10,20 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            
-            $table->string('titulo');
-            $table->string('ruta_archivo'); // Path en storage/app/public
-            $table->string('tipo');         // pdf, docx, xlsx
-            
-            // Relación: Quién subió el archivo
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            
-            $table->timestamps();
-        });
-    }
+        {
+            Schema::create('documents', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('titulo');
+                $table->string('ruta_archivo');
+                $table->string('tipo');
+                $table->string('estado')->default('Original'); 
+                $table->timestamps();
+                $table->softDeletes(); 
+            });
+        }
 
     /**
      * Reverse the migrations.
