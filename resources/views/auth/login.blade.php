@@ -6,12 +6,18 @@
     <title>Acceso Confidencial - EMT</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-900 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-900 min-h-screen flex flex-col items-center justify-center p-4 relative">
     
-    <div class="mb-6 text-center w-full max-w-4xl mt-4">
+    <div class="absolute top-8 left-8 z-20">
+        <img src="{{ asset('img/logo_defensa.png') }}" 
+             alt="Logo SEDENA" 
+             class="w-40 md:w-56 lg:w-64 h-auto drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] opacity-100 transition-transform hover:scale-105 duration-300">
+    </div>
+
+    <div class="mb-6 text-center w-full max-w-4xl mt-20 md:mt-4">
         
         <div class="flex justify-center mb-6">
-            <img src="{{ asset('logo_emt.png') }}" alt="Escudo de la Escuela Militar de Transmisiones" class="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl">
+            <img src="{{ asset('img/logo_emt.png') }}" alt="Escudo de la Escuela Militar de Transmisiones" class="w-32 h-32 md:w-40 md:h-40 object-contain drop-shadow-2xl">
         </div>
 
         <div class="space-y-1">
@@ -48,7 +54,7 @@
                 @csrf
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Token de Autenticación:</label>
-                    <textarea name="token" rows="3" class="w-full border border-gray-300 p-3 rounded focus:outline-none focus:border-green-700 focus:ring-1 focus:ring-green-700 font-mono text-sm text-gray-700 shadow-inner" placeholder="Pegue su token de 32 bits aquí..." required></textarea>
+                    <textarea name="token" rows="3" class="w-full border border-gray-300 p-3 rounded focus:outline-none focus:border-green-700 focus:ring-1 focus:ring-green-700 font-mono text-sm text-gray-700 shadow-inner" placeholder="Pegue su token de acceso aquí..." required></textarea>
                 </div>
 
                 <button type="submit" class="w-full bg-green-800 text-white font-bold py-3 px-4 rounded hover:bg-green-900 transition flex justify-center items-center gap-2 shadow-lg border-b-4 border-green-950 hover:border-green-900 active:border-b-0 active:mt-1">
@@ -56,6 +62,13 @@
                     INGRESAR AL SISTEMA
                 </button>
             </form>
+
+            <div class="mt-4 pt-4 border-t border-gray-200 text-center">
+                <p class="text-[10px] text-gray-500 uppercase leading-tight font-semibold">
+                    Si no cuenta con un token o ha expirado, solicite uno nuevo al <br>
+                    <span class="text-green-700 font-bold">Sgto. 2/o. Cdtes. José de Jesús García Bello</span>
+                </p>
+            </div>
         </div>
     </div>
 

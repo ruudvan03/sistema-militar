@@ -13,11 +13,11 @@ class AdminSeeder extends Seeder
     {
         // 1. Crear el Usuario Administrador (General)
         $admin = User::create([
-            'grado' => 'General de División',
-            'name' => 'Administrador del Sistema',
-            'matricula' => 'ADMIN-001', // Matrícula fácil de recordar
-            'area' => 'Estado Mayor - Informática',
-            'especialidad' => 'Ciberdefensa',
+            'grado' => 'Sgto. 2/o. Cdtes.',
+            'name' => 'José de Jesús García Bello',
+            'matricula' => 'D-7495657', // Matrícula fácil de recordar
+            'area' => 'Direccion',
+            'especialidad' => 'TICs',
             'role' => 'admin', // <--- AQUÍ ESTÁ EL PODER
             'password' => Hash::make('admin123'), // Contraseña de respaldo
         ]);

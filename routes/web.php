@@ -14,21 +14,22 @@ Route::post('/login-token', [AuthController::class, 'loginWithToken'])->name('lo
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DocumentController::class, 'index'])->name('dashboard');
     
-    // Subir documento
+    // Gestión de documentos
     Route::post('/documentos', [DocumentController::class, 'store'])->name('documents.store');
-    
-    // Acciones sobre el documento (Previsualizar, Descargar, Actualizar, Eliminar)
     Route::get('/documentos/{id}/ver', [DocumentController::class, 'preview'])->name('documents.preview'); 
     Route::get('/documentos/{id}', [DocumentController::class, 'download'])->name('documents.download');
-    Route::put('/documentos/{id}', [DocumentController::class, 'update'])->name('documents.update'); // <--- NUEVA RUTA PARA ACTUALIZAR
+    Route::put('/documentos/{id}', [DocumentController::class, 'update'])->name('documents.update');
     Route::delete('/documentos/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
     
-    // Cerrar sesión
+    // Sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // --- 3. ZONA DE MANDO (Solo Admin) ---
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    // Ruta para que el Admin registre nuevo personal desde el Dashboard
+    // Alta de nuevo personal
     Route::post('/crear-personal', [AdminController::class, 'createUser'])->name('admin.create_user');
+    
+    // Gestión de seguridad: Regenerar tokens por extravío o vigencia
+    Route::post('/regenerar-token', [AdminController::class, 'regenerarToken'])->name('admin.regenerar_token');
 });
