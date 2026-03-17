@@ -27,7 +27,7 @@ class AuthController extends Controller
             'password' => 'required|min:6', 
         ]);
 
-        // Creamos al usuario
+        // Creamos al usuario (por defecto rol 'usuario')
         $user = User::create([
             'grado' => $request->grado,
             'name' => $request->name,
@@ -38,7 +38,7 @@ class AuthController extends Controller
             'role' => 'usuario'
         ]);
 
-        // Generamos el token inicial siguiendo la configuración global
+        // Generamos el token inicial siguiendo la configuración global (con expiración)
         $token = JWTAuth::fromUser($user);
 
         return view('auth.show_token', compact('token', 'user'));
@@ -59,19 +59,20 @@ class AuthController extends Controller
                 return back()->with('error', 'TOKEN NO VÁLIDO O USUARIO NO ENCONTRADO.');
             }
 
-            // --- LÓGICA DE VIGENCIA ADMINISTRADA POR EL ROOT ---
-            // Si es ADMIN, generamos un token persistente (sin expiración)
+            // --- LÓGICA DE VIGENCIA DIFERENCIADA ---
             if ($user->role === 'admin') {
-                $finalToken = JWTAuth::fromUser($user, ['exp' => null]);
+                JWTAuth::factory()->setTTL(null);
+                
+                $finalToken = JWTAuth::fromUser($user);
             } else {
-                // Si es USUARIO, el token mantiene su vigencia estándar
+                // Si es USUARIO, el token mantiene su vigencia original
                 $finalToken = $request->token;
             }
 
-            // Iniciamos la sesión en el protector Web de Laravel
+            // Iniciamos la sesión en el protector Web de Laravel (Session)
             Auth::login($user);
 
-            // Almacenamos el token final en la sesión por seguridad
+            // Almacenamos el token final en la sesión para usarlo en peticiones posteriores
             session(['jwt_token' => $finalToken]);
 
             return redirect()->route('dashboard');
@@ -83,7 +84,6 @@ class AuthController extends Controller
         }
     }
     
-    // 5. Salir
     public function logout() {
         Auth::logout();
         session()->forget('jwt_token');
