@@ -36,11 +36,21 @@
             </div>
             
             <div>
+                <label class="block text-sm font-bold text-gray-700">Duración del Token</label>
+                <select name="vigencia" class="w-full border p-2 rounded bg-gray-50 text-gray-700" required>
+                    <option value="" disabled selected>Seleccione la vigencia...</option>
+                    <option value="15">15 Días</option>
+                    <option value="30">1 Mes (30 Días)</option>
+                    <option value="60">2 Meses (60 Días)</option>
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-sm font-bold text-gray-700">Contraseña de Respaldo</label>
                 <input type="password" name="password" class="w-full border p-2 rounded bg-gray-50" required>
             </div>
 
-            <button type="submit" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded transition">
+            <button type="submit" class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded transition mt-4">
                 REGISTRAR Y OBTENER TOKEN
             </button>
         </form>

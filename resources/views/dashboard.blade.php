@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('img/logo_defensa.png') }}" type="image/png">
     <title>Centro de Mando</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -41,6 +42,14 @@
                 <form action="{{ route('admin.regenerar_token') }}" method="POST" class="space-y-3">
                     @csrf
                     <input type="text" name="matricula" placeholder="Matrícula del elemento" class="w-full border p-2 rounded bg-gray-50 focus:border-blue-500 focus:outline-none uppercase font-mono" required>
+                    
+                    <select name="vigencia" class="w-full border p-2 rounded bg-gray-50 focus:border-blue-500 focus:outline-none text-gray-700 text-sm" required>
+                        <option value="" disabled selected>Duración del nuevo token...</option>
+                        <option value="15">15 Días</option>
+                        <option value="30">1 Mes (30 Días)</option>
+                        <option value="60">2 Meses (60 Días)</option>
+                    </select>
+
                     <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded transition shadow">REGENERAR TOKEN</button>
                 </form>
             </div>
@@ -97,6 +106,17 @@
                             <input type="text" name="especialidad" placeholder="Ej: Transmisiones" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none" required>
                         </div>
                     </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Duración del Token</label>
+                        <select name="vigencia" class="w-full border p-2 rounded bg-gray-50 focus:border-red-500 focus:outline-none text-gray-700" required>
+                            <option value="" disabled selected>Seleccione la vigencia...</option>
+                            <option value="15">15 Días</option>
+                            <option value="30">1 Mes (30 Días)</option>
+                            <option value="60">2 Meses (60 Días)</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="w-full bg-red-800 hover:bg-red-900 font-bold py-2.5 rounded transition text-white shadow">
                         GENERAR ACCESO
                     </button>

@@ -10,14 +10,11 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // 1. Mostrar formulario de registro
     public function showRegister() {
         return view('auth.register');
     }
 
-    // 2. Procesar el registro y GENERAR TOKEN
     public function register(Request $request) {
-        // Validamos los datos militares
         $request->validate([
             'grado' => 'required',
             'name' => 'required',
@@ -25,9 +22,9 @@ class AuthController extends Controller
             'area' => 'required',
             'especialidad' => 'required',
             'password' => 'required|min:6', 
+            'vigencia' => 'required|in:15,30,60', 
         ]);
 
-        // Creamos al usuario (por defecto rol 'usuario')
         $user = User::create([
             'grado' => $request->grado,
             'name' => $request->name,
@@ -38,41 +35,38 @@ class AuthController extends Controller
             'role' => 'usuario'
         ]);
 
-        // Generamos el token inicial siguiendo la configuración global (con expiración)
+
+        $minutosTTL = (int) $request->vigencia * 24 * 60;
+
+        JWTAuth::factory()->setTTL($minutosTTL);
+        
         $token = JWTAuth::fromUser($user);
 
         return view('auth.show_token', compact('token', 'user'));
     }
 
-    // 3. Mostrar el Login (Solo pide Token)
     public function showLogin() {
         return view('auth.login');
     }
 
-    // 4. Procesar el Login con Token (CON EXPIRACIÓN DIFERENCIADA)
     public function loginWithToken(Request $request) {
         $request->validate(['token' => 'required']);
 
         try {
-            // Verificamos si el token es válido y obtenemos al usuario
             if (!$user = JWTAuth::setToken($request->token)->authenticate()) {
                 return back()->with('error', 'TOKEN NO VÁLIDO O USUARIO NO ENCONTRADO.');
             }
 
-            // --- LÓGICA DE VIGENCIA DIFERENCIADA ---
             if ($user->role === 'admin') {
                 JWTAuth::factory()->setTTL(null);
                 
                 $finalToken = JWTAuth::fromUser($user);
             } else {
-                // Si es USUARIO, el token mantiene su vigencia original
                 $finalToken = $request->token;
             }
 
-            // Iniciamos la sesión en el protector Web de Laravel (Session)
             Auth::login($user);
 
-            // Almacenamos el token final en la sesión para usarlo en peticiones posteriores
             session(['jwt_token' => $finalToken]);
 
             return redirect()->route('dashboard');

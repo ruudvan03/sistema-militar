@@ -11,12 +11,10 @@ class IsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Verificamos si está logueado y si su rol es 'admin'
         if (Auth::check() && Auth::user()->role === 'admin') {
-            return $next($request); // ¡Pase, Comandante!
+            return $next($request); 
         }
 
-        // 2. Si no es admin, abortamos con error 403 (Prohibido)
         abort(403, 'ACCESO DENEGADO: Área restringida al Servidor Central. Su intento ha sido registrado.');
     }
 }
